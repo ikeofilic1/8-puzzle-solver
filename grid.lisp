@@ -1,18 +1,34 @@
-(ql:quickload :sketch)
-(use-package :sketch)
+(ql:quickload "sketch")
 
-;; CONSTANTS
-(defconstant +window-width+ 1000)
-(defconstant +window-height+ 800)
-(defconstant +grid-width+ 600)
-(defconstant +grid-height+ 600)
+(defpackage :grid-example
+  (:use :cl :sketch))
 
-(defsketch grid 
-  ((width +window-width+)
-  (height +window-height+)
-  (labels (("1" "2" "3") ("4" "5" "6") ("7" "8" ""))))
+(in-package :grid-example)
 
+(defparameter *grid-width* 5)
+(defparameter *grid-height* 5)
+(defparameter *cell-size* 50)
+
+(defun draw-grid (x y)
+  (dotimes (row *grid-height*)
+    (dotimes (col *grid-width*)
+      (let ((xi (+ x (* col *cell-size*)))
+            (yi (+ y (* row *cell-size*)))
+            (number (+ (* row *grid-width*) col))) ; Calculate the number
+        (with-pen (make-pen :fill (gray 0.9) :stroke +black+) ; Light gray cell, black border
+          (rect xi yi *cell-size* *cell-size*)) 
+        (with-font (make-font :color +black+ :align :center) ; Black text
+          (text (write-to-string number) 
+            (+ xi (/ *cell-size* 2)) 
+            (- (+ yi (/ *cell-size* 2)) (/ 20 2))))))))
+
+(defsketch grid-sketch 
+    ((width 800)
+     (height 500)
+     (background +white+)) ; White background
+  (draw-grid 100 100)
   )
 
-(defmethod move-tile ((grid-obj grid) start-pos end-pos)
-  )
+; (line-height (font-line-height (env-font *env*)))
+
+(make-instance 'grid-sketch)
